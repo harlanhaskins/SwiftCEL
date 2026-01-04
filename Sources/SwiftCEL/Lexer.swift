@@ -93,6 +93,7 @@ public final class Lexer {
 
         while !isAtEnd() {
             skipWhitespace()
+            skipComments()
             if isAtEnd() { break }
 
             let token = try nextToken()
@@ -379,6 +380,20 @@ public final class Lexer {
     private func skipWhitespace() {
         while !isAtEnd() && peek().isWhitespace {
             advance()
+        }
+    }
+
+    private func skipComments() {
+        // Check for // comment
+        if peek() == "/" && peekNext() == "/" {
+            // Skip until end of line or end of input
+            while !isAtEnd() && peek() != "\n" {
+                advance()
+            }
+            // Skip the newline if present
+            if !isAtEnd() && peek() == "\n" {
+                advance()
+            }
         }
     }
 }

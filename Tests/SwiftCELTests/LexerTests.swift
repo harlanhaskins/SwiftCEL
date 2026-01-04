@@ -313,6 +313,78 @@ struct LexerTests {
         }
     }
 
+    // MARK: - Comments
+
+    @Test("Single line comment")
+    func testSingleLineComment() throws {
+        let lexer = Lexer(input: "// This is a comment\n42")
+        let tokens = try lexer.tokenize()
+
+        #expect(tokens.count == 2) // number + EOF
+        guard case .int(42) = tokens[0] else {
+            Issue.record("Expected int token")
+            return
+        }
+    }
+
+    @Test("Comment at end of expression")
+    func testCommentAtEndOfExpression() throws {
+        let lexer = Lexer(input: "x + 1 // add one")
+        let tokens = try lexer.tokenize()
+
+        #expect(tokens.count == 4) // x, +, 1, EOF
+        guard case .identifier("x") = tokens[0] else {
+            Issue.record("Expected identifier 'x'")
+            return
+        }
+        #expect(tokens[1] == .plus)
+        guard case .int(1) = tokens[2] else {
+            Issue.record("Expected int 1")
+            return
+        }
+    }
+
+    @Test("Multiple comments")
+    func testMultipleComments() throws {
+        let lexer = Lexer(input: """
+        // First comment
+        x + 1
+        // Second comment
+        """)
+        let tokens = try lexer.tokenize()
+
+        #expect(tokens.count == 4) // x, +, 1, EOF
+        guard case .identifier("x") = tokens[0] else {
+            Issue.record("Expected identifier 'x'")
+            return
+        }
+    }
+
+    @Test("Comment without newline at end")
+    func testCommentWithoutNewline() throws {
+        let lexer = Lexer(input: "42 // comment at end")
+        let tokens = try lexer.tokenize()
+
+        #expect(tokens.count == 2) // number + EOF
+        guard case .int(42) = tokens[0] else {
+            Issue.record("Expected int token")
+            return
+        }
+    }
+
+    @Test("Expression from documentation with comment")
+    func testDocumentationExample() throws {
+        let lexer = Lexer(input: "// Simple predicates\n'tacocat'.startsWith('taco')")
+        let tokens = try lexer.tokenize()
+
+        // Should have: string, dot, identifier, lparen, string, rparen, EOF
+        #expect(tokens.count == 7)
+        guard case .string("tacocat") = tokens[0] else {
+            Issue.record("Expected string 'tacocat'")
+            return
+        }
+    }
+
     // MARK: - Error Cases
 
     @Test("Invalid character")

@@ -5,9 +5,10 @@ for locally evaluating expression predicates against in-memory data.
 
 This is a mostly-full and well-tested implementation of the CEL spec and
 supports all the native operations for lists and strings and also supports
-adding custom operations to evaluate with your own functions. In this case, it's
-a superset of CEL that supports methods on all data types (not just strings and
-lists).
+adding custom operations to evaluate with your own functions.
+
+> Note that SwiftCEL is currently untyped, and doesn't have type metadata operators
+> that exist in the full CEL spec.
 
 ## Usage
 
